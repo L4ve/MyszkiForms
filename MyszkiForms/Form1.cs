@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace MyszkiForms
@@ -37,7 +39,7 @@ namespace MyszkiForms
             comboBox1.SelectedIndexChanged += ComboBox1_SelectedIndexChanged;
             comboBox2.SelectedIndexChanged += ComboBox2_SelectedIndexChanged;
 
-            comboBox1.SelectedIndex = 0;
+            comboBox1.SelectedIndex = 2;
             comboBox2.SelectedIndex = 1;
 
             linkLabel1.LinkClicked += LinkLabel1_LinkClicked;
@@ -55,7 +57,11 @@ namespace MyszkiForms
                 Myszka1_weight.Text = $"Waga(g): {mouse.Waga}";
                 linkLabel1.Text = "Link";
             }
+
+            // porównanie wag i podświetlenie lżejszej myszki
+            HighlightMouse();
         }
+
         // Myszka2 pokazane dane
         private void ComboBox2_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -67,7 +73,51 @@ namespace MyszkiForms
                 Myszka2_Waga.Text = $"Waga(g): {mouse.Waga}";
                 linkLabel2.Text = "Link";
             }
+
+            // porównanie wag i podświetlenie lżejszej myszki
+            HighlightMouse();
         }
+
+        // sprawdza która myszka jest lżejsza i ustawia zielony kolor
+        // sprawdza która myszka jest lżejsza i ustawia zielony + pogrubienie
+        private void HighlightMouse()
+        {
+            if (comboBox1.SelectedItem is not Mouse m1 ||
+                comboBox2.SelectedItem is not Mouse m2)
+                return;
+
+            // reset kolorów i czcionki
+            SetMouse1Color(Color.Black, false);
+            SetMouse2Color(Color.Black, false);
+
+            if (m1.Waga < m2.Waga)
+                SetMouse1Color(Color.Green, true);
+            else if (m2.Waga < m1.Waga)
+                SetMouse2Color(Color.Green, true);
+        }
+
+
+        // ustawianie koloru etykiet dla myszki 1
+        // ustawianie koloru tylko dla wagi myszki 1
+        private void SetMouse1Color(Color color, bool bold)
+        {
+            Myszka1_weight.ForeColor = color;
+            Myszka1_weight.Font = new Font(
+                Myszka1_weight.Font,
+                bold ? FontStyle.Bold : FontStyle.Regular
+            );
+        }
+
+        // ustawianie koloru tylko dla wagi myszki 2
+        private void SetMouse2Color(Color color, bool bold)
+        {
+            Myszka2_Waga.ForeColor = color;
+            Myszka2_Waga.Font = new Font(
+                Myszka2_Waga.Font,
+                bold ? FontStyle.Bold : FontStyle.Regular
+            );
+        }
+
         //działanie linku w myszka1 (UseShellExecute powoduje że link odpala sie w domyślnej przeglądarce zamiast w stronie)
         private void LinkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
@@ -80,6 +130,7 @@ namespace MyszkiForms
                 });
             }
         }
+
         //działanie linku w myszka2 (UseShellExecute powoduje że link odpala sie w domyślnej przeglądarce zamiast w stronie)
         private void LinkLabel2_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
